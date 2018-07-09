@@ -2,10 +2,12 @@ package org.aerogear.mobile.sync;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
+import com.apollographql.apollo.ApolloSubscriptionCall;
 import com.apollographql.apollo.api.Mutation;
 import com.apollographql.apollo.api.Operation;
 import com.apollographql.apollo.api.Query;
 import com.apollographql.apollo.api.Response;
+import com.apollographql.apollo.api.Subscription;
 import com.apollographql.apollo.exception.ApolloException;
 import com.apollographql.apollo.subscription.WebSocketSubscriptionTransport.Factory;
 
@@ -61,6 +63,10 @@ public class SyncService {
 
     public SyncMutation mutation(@Nonnull Mutation mutation) {
         return new SyncMutation(this.apolloClient, nonNull(mutation, "mutation"));
+    }
+
+    public SyncSubscription subscribe(@Nonnull Subscription subscription) {
+        return new SyncSubscription(this.apolloClient, nonNull(subscription, "subscription"));
     }
 
     public static class SyncQuery {
@@ -143,6 +149,48 @@ public class SyncService {
                         });
 
                 latch.await();
+
+                return responseData.get();
+
+            }).requestOn(new AppExecutors().networkThread());
+
+        }
+    }
+
+    public static class SyncSubscription {
+
+        private final ApolloClient apolloClient;
+        private final Subscription subscription;
+
+        public SyncSubscription(@Nonnull ApolloClient apolloClient, @Nonnull Subscription subscription) {
+            this.apolloClient = nonNull(apolloClient, "apolloClient");
+            this.subscription = nonNull(subscription, "subscription");
+        }
+
+        public <T extends Operation.Data> Request<Response<T>> execute(Class<T> responseDataClass) {
+
+            nonNull(responseDataClass, "responseDataClass");
+
+            return Requester.call(() -> {
+                final AtomicReference<Response<T>> responseData = new AtomicReference();
+
+                apolloClient
+                        .subscribe(subscription)
+                        .execute(new ApolloSubscriptionCall.Callback() {
+                            @Override
+                            public void onResponse(@Nonnull Response response) {
+                                responseData.set(response);
+                            }
+
+                            @Override
+                            public void onFailure(@Nonnull ApolloException e) {
+                                throw e;
+                            }
+
+                            @Override
+                            public void onCompleted() {
+                            }
+                        });
 
                 return responseData.get();
 

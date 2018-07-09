@@ -12,11 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.ImageView;
 
-import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
-import com.apollographql.apollo.ApolloSubscriptionCall;
-import com.apollographql.apollo.api.Response;
-import com.apollographql.apollo.exception.ApolloException;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.nitrico.lastadapter.LastAdapter;
@@ -28,16 +24,12 @@ import org.aerogear.android.app.memeolist.graphql.ListMemesQuery;
 import org.aerogear.android.app.memeolist.model.Meme;
 import org.aerogear.mobile.core.MobileCore;
 import org.aerogear.mobile.core.executor.AppExecutors;
-import org.aerogear.mobile.core.reactive.Request;
-import org.aerogear.mobile.core.reactive.RequestMapFunction;
 import org.aerogear.mobile.core.reactive.Requester;
 import org.aerogear.mobile.core.reactive.Responder;
 import org.aerogear.mobile.sync.SyncService;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -77,30 +69,28 @@ public class MemeListActivity extends AppCompatActivity {
 
     private void subscription() {
 
-        ApolloSubscriptionCall<CreateMemeSubscription.Data> subscriptionCall = apolloClient
-                .subscribe(new CreateMemeSubscription());
-
-        subscriptionCall.execute(new ApolloSubscriptionCall.Callback<CreateMemeSubscription.Data>() {
-            @Override
-            public void onResponse(@Nonnull Response<CreateMemeSubscription.Data> response) {
-
-                new AppExecutors().mainThread().submit(() -> {
+        SyncService
+                .getInstance()
+                .subscribe(new CreateMemeSubscription())
+                .execute(CreateMemeSubscription.Data.class)
+                .respondOn(new AppExecutors().mainThread())
+                .requestMap(response -> {
                     CreateMemeSubscription.Node node = response.data().Meme().node();
-                    memes.add(0, new Meme(node.id(), node.photoUrl()));
-                    mMemes.smoothScrollToPosition(0);
+                    Meme meme = new Meme(node.id(), node.photoUrl());
+                    return Requester.emit(meme);
+                })
+                .respondWith(new Responder<Meme>() {
+                    @Override
+                    public void onResult(Meme meme) {
+                        memes.add(meme);
+                        mMemes.smoothScrollToPosition(0);
+                    }
+
+                    @Override
+                    public void onException(Exception exception) {
+                        MobileCore.getLogger().error(exception.getMessage(), exception);
+                    }
                 });
-
-            }
-
-            @Override
-            public void onFailure(@Nonnull ApolloException e) {
-                MobileCore.getLogger().error(e.getMessage(), e);
-            }
-
-            @Override
-            public void onCompleted() {
-            }
-        });
 
     }
 
