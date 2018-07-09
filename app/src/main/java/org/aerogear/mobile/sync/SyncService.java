@@ -19,13 +19,18 @@ import javax.annotation.Nonnull;
 
 import okhttp3.OkHttpClient;
 
+import static org.aerogear.mobile.core.utils.SanityCheck.nonNull;
+
 public class SyncService {
 
     private static SyncService instance;
 
     private final ApolloClient apolloClient;
 
-    public SyncService(String serverUrl, String webSocketUrl) {
+    public SyncService(@Nonnull String serverUrl, @Nonnull String webSocketUrl) {
+        nonNull(serverUrl, "serverUrl");
+        nonNull(webSocketUrl, "webSocketUrl");
+
         OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
 
         apolloClient = ApolloClient.builder()
@@ -49,8 +54,8 @@ public class SyncService {
         return apolloClient;
     }
 
-    public SyncQuery query(Query query) {
-        return new SyncQuery(this.apolloClient, query);
+    public SyncQuery query(@Nonnull Query query) {
+        return new SyncQuery(this.apolloClient, nonNull(query, "query"));
     }
 
     public static class SyncQuery {
@@ -58,12 +63,14 @@ public class SyncService {
         private final ApolloClient apolloClient;
         private final Query query;
 
-        public SyncQuery(ApolloClient apolloClient, Query query) {
-            this.apolloClient = apolloClient;
-            this.query = query;
+        public SyncQuery(@Nonnull ApolloClient apolloClient, @Nonnull Query query) {
+            this.apolloClient = nonNull(apolloClient, "apolloClient");
+            this.query = nonNull(query, "query");
         }
 
         public <T extends Operation.Data> Request<Response<T>> execute(Class<T> responseDataClass) {
+
+            nonNull(responseDataClass, "responseDataClass");
 
             return Requester.call(() -> {
                 CountDownLatch latch = new CountDownLatch(1);
@@ -87,7 +94,9 @@ public class SyncService {
                         });
 
                 latch.await();
+
                 return responseData.get();
+                
             }).requestOn(new AppExecutors().networkThread());
 
         }
