@@ -25,15 +25,6 @@ public class SyncService {
 
     private final ApolloClient apolloClient;
 
-    public SyncService(String serverUrl) {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
-
-        apolloClient = ApolloClient.builder()
-                .serverUrl(serverUrl)
-                .okHttpClient(okHttpClient)
-                .build();
-    }
-
     public SyncService(String serverUrl, String webSocketUrl) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
 
