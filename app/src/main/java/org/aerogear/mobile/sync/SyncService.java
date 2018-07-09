@@ -2,6 +2,7 @@ package org.aerogear.mobile.sync;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
+import com.apollographql.apollo.api.Mutation;
 import com.apollographql.apollo.api.Operation;
 import com.apollographql.apollo.api.Query;
 import com.apollographql.apollo.api.Response;
@@ -58,6 +59,10 @@ public class SyncService {
         return new SyncQuery(this.apolloClient, nonNull(query, "query"));
     }
 
+    public SyncMutation mutation(@Nonnull Mutation mutation) {
+        return new SyncMutation(this.apolloClient, nonNull(mutation, "mutation"));
+    }
+
     public static class SyncQuery {
 
         private final ApolloClient apolloClient;
@@ -97,6 +102,50 @@ public class SyncService {
 
                 return responseData.get();
                 
+            }).requestOn(new AppExecutors().networkThread());
+
+        }
+    }
+
+    public static class SyncMutation {
+
+        private final ApolloClient apolloClient;
+        private final Mutation mutation;
+
+        public SyncMutation(@Nonnull ApolloClient apolloClient, @Nonnull Mutation mutation) {
+            this.apolloClient = nonNull(apolloClient, "apolloClient");
+            this.mutation = nonNull(mutation, "mutation");
+        }
+
+        public <T extends Operation.Data> Request<Response<T>> execute(Class<T> responseDataClass) {
+
+            nonNull(responseDataClass, "responseDataClass");
+
+            return Requester.call(() -> {
+                CountDownLatch latch = new CountDownLatch(1);
+
+                final AtomicReference<Response<T>> responseData = new AtomicReference();
+
+                apolloClient
+                        .mutate(mutation)
+                        .enqueue(new ApolloCall.Callback<T>() {
+                            @Override
+                            public void onResponse(@Nonnull Response<T> response) {
+                                responseData.set(response);
+                                latch.countDown();
+                            }
+
+                            @Override
+                            public void onFailure(@Nonnull ApolloException e) {
+                                latch.countDown();
+                                throw e;
+                            }
+                        });
+
+                latch.await();
+
+                return responseData.get();
+
             }).requestOn(new AppExecutors().networkThread());
 
         }
