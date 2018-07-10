@@ -14,15 +14,15 @@
         {
           "kind": "OBJECT",
           "name": "Query",
-          "description": "The query type, represents all of the entry points into our object graph",
+          "description": null,
           "fields": [
             {
               "name": "allMemes",
-              "description": "",
+              "description": null,
               "args": [
                 {
                   "name": "orderBy",
-                  "description": "",
+                  "description": null,
                   "type": {
                     "kind": "ENUM",
                     "name": "MemeOrderBy",
@@ -52,44 +52,44 @@
         {
           "kind": "ENUM",
           "name": "MemeOrderBy",
-          "description": "",
+          "description": null,
           "fields": null,
           "inputFields": null,
           "interfaces": null,
           "enumValues": [
             {
               "name": "id_ASC",
-              "description": "",
+              "description": null,
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "id_DESC",
-              "description": "",
+              "description": null,
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "photoUrl_ASC",
-              "description": "",
+              "description": null,
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "photoUrl_DESC",
-              "description": "",
+              "description": null,
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "votes_ASC",
-              "description": "",
+              "description": null,
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
               "name": "votes_DESC",
-              "description": "",
+              "description": null,
               "isDeprecated": false,
               "deprecationReason": null
             }
@@ -99,11 +99,11 @@
         {
           "kind": "OBJECT",
           "name": "Meme",
-          "description": "",
+          "description": null,
           "fields": [
             {
               "name": "_id",
-              "description": "",
+              "description": null,
               "args": [],
               "type": {
                 "kind": "NON_NULL",
@@ -119,7 +119,7 @@
             },
             {
               "name": "photoUrl",
-              "description": "",
+              "description": null,
               "args": [],
               "type": {
                 "kind": "NON_NULL",
@@ -135,7 +135,7 @@
             },
             {
               "name": "votes",
-              "description": "",
+              "description": null,
               "args": [],
               "type": {
                 "kind": "SCALAR",
@@ -184,15 +184,15 @@
         {
           "kind": "OBJECT",
           "name": "Mutation",
-          "description": "The mutation type, represents all updates we can make to our data",
+          "description": null,
           "fields": [
             {
               "name": "createMeme",
-              "description": "",
+              "description": null,
               "args": [
                 {
                   "name": "photoUrl",
-                  "description": "",
+                  "description": null,
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -222,11 +222,11 @@
         {
           "kind": "OBJECT",
           "name": "Subscription",
-          "description": "",
+          "description": null,
           "fields": [
             {
               "name": "_",
-              "description": "",
+              "description": null,
               "args": [],
               "type": {
                 "kind": "SCALAR",
@@ -1163,17 +1163,6 @@
           ]
         }
       ]
-    }
-  },
-  "extensions": {
-    "tracing": {
-      "version": 1,
-      "startTime": "2018-07-10T12:02:00.384Z",
-      "endTime": "2018-07-10T12:02:00.389Z",
-      "duration": 5336799,
-      "execution": {
-        "resolvers": []
-      }
     }
   }
 }

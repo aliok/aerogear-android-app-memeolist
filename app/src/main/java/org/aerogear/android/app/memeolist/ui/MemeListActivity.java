@@ -23,7 +23,7 @@ import com.github.nitrico.lastadapter.LastAdapter;
 
 import org.aerogear.android.app.memeolist.BR;
 import org.aerogear.android.app.memeolist.R;
-import org.aerogear.android.app.memeolist.graphql.CreateMemeSubscription;
+// import org.aerogear.android.app.memeolist.graphql.CreateMemeSubscription;
 import org.aerogear.android.app.memeolist.graphql.ListMemesQuery;
 import org.aerogear.android.app.memeolist.model.Meme;
 import org.aerogear.mobile.core.MobileCore;
@@ -65,39 +65,39 @@ public class MemeListActivity extends AppCompatActivity {
 
         mSwipe.setOnRefreshListener(() -> retrieveMemes());
 
-        subscription();
+        // subscription();
 
         retrieveMemes();
     }
 
-    private void subscription() {
-
-        ApolloSubscriptionCall<CreateMemeSubscription.Data> subscriptionCall = apolloClient
-                .subscribe(new CreateMemeSubscription());
-
-        subscriptionCall.execute(new ApolloSubscriptionCall.Callback<CreateMemeSubscription.Data>() {
-            @Override
-            public void onResponse(@Nonnull Response<CreateMemeSubscription.Data> response) {
-
-                new AppExecutors().mainThread().submit(() -> {
-                    CreateMemeSubscription.Node node = response.data().Meme().node();
-                    memes.add(0, new Meme(node.id(), node.photoUrl()));
-                    mMemes.smoothScrollToPosition(0);
-                });
-
-            }
-
-            @Override
-            public void onFailure(@Nonnull ApolloException e) {
-                MobileCore.getLogger().error(e.getMessage(), e);
-            }
-
-            @Override
-            public void onCompleted() {
-            }
-        });
-
-    }
+//    private void subscription() {
+//
+//        ApolloSubscriptionCall<CreateMemeSubscription.Data> subscriptionCall = apolloClient
+//                .subscribe(new CreateMemeSubscription());
+//
+//        subscriptionCall.execute(new ApolloSubscriptionCall.Callback<CreateMemeSubscription.Data>() {
+//            @Override
+//            public void onResponse(@Nonnull Response<CreateMemeSubscription.Data> response) {
+//
+//                new AppExecutors().mainThread().submit(() -> {
+//                    CreateMemeSubscription.Node node = response.data().Meme().node();
+//                    memes.add(0, new Meme(node.id(), node.photoUrl()));
+//                    mMemes.smoothScrollToPosition(0);
+//                });
+//
+//            }
+//
+//            @Override
+//            public void onFailure(@Nonnull ApolloException e) {
+//                MobileCore.getLogger().error(e.getMessage(), e);
+//            }
+//
+//            @Override
+//            public void onCompleted() {
+//            }
+//        });
+//
+//    }
 
     private void retrieveMemes() {
         apolloClient
@@ -111,7 +111,7 @@ public class MemeListActivity extends AppCompatActivity {
                             List<ListMemesQuery.AllMeme> allMemes = response.data().allMemes();
 
                             for (ListMemesQuery.AllMeme meme : allMemes) {
-                                memes.add(new Meme(meme.id(), meme.photoUrl()));
+                                memes.add(new Meme(meme._id(), decode(meme.photoUrl())));
                             }
 
                             mSwipe.setRefreshing(false);
@@ -125,6 +125,12 @@ public class MemeListActivity extends AppCompatActivity {
                         mSwipe.setRefreshing(false);
                     }
                 });
+    }
+
+    private String decode(String text) {
+        text = text.replace("&#x3D;", "=");
+        text = text.replace("&amp;", "&");
+        return text;
     }
 
     @BindingAdapter("memeImage")

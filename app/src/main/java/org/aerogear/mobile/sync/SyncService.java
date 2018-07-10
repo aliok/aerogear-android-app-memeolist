@@ -34,9 +34,9 @@ public class SyncService {
     public static SyncService getInstance() {
         if (instance == null) {
             // TODO replace for the URL from mobile-services.json
-            String serverUrl = "https://api.graph.cool/simple/v1/cjiyvc1wa40kg011846ev0ff8";
-            String webSocketUrl = "wss://subscriptions.us-west-2.graph.cool/v1/cjiyvc1wa40kg011846ev0ff8";
-            instance = new SyncService(serverUrl, webSocketUrl);
+            String serverUrl = "http://192.168.0.107:8000/graphql";
+            // String webSocketUrl = "wss://subscriptions.us-west-2.graph.cool/v1/cjiyvc1wa40kg011846ev0ff8";
+            instance = new SyncService(serverUrl);
         }
         return instance;
     }

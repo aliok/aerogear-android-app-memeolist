@@ -1,27 +1,13 @@
 query listMemes {
   allMemes(orderBy: id_DESC) {
-    id
+    _id
     photoUrl
   }
 }
 
 mutation newMeme($url: String!) {
   createMeme(photoUrl: $url) {
-    id
+    _id
     photoUrl
-  }
-}
-
-subscription createMeme {
-  Meme(
-    filter: {
-      mutation_in: [CREATED]
-    }
-  ) {
-    mutation
-    node {
-      id
-      photoUrl
-    }
   }
 }

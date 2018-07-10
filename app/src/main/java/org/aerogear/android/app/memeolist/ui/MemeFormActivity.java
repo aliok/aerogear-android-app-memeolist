@@ -203,24 +203,26 @@ public class MemeFormActivity extends AppCompatActivity {
 
         return Requester.call(() -> {
 
-            RequestBody requestBody = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("type", "file")
-                    .addFormDataPart("image", file.getName(),
-                            RequestBody.create(MediaType.parse("text/image/jpeg"), file))
-                    .build();
-
-            Request request = new Request.Builder()
-                    .url("https://api.imgur.com/3/image")
-                    .addHeader("Authorization", "Client-ID f1041ec178352c6")
-                    .addHeader("content-type", "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW")
-                    .post(requestBody)
-                    .build();
-
-            OkHttpClient client = new OkHttpClient.Builder().build();
-            okhttp3.Response response = client.newCall(request).execute();
-            JSONObject jsonResponse = new JSONObject(response.body().string());
-            return jsonResponse.getJSONObject("data").getString("link");
+//            RequestBody requestBody = new MultipartBody.Builder()
+//                    .setType(MultipartBody.FORM)
+//                    .addFormDataPart("type", "file")
+//                    .addFormDataPart("image", file.getName(),
+//                            RequestBody.create(MediaType.parse("text/image/jpeg"), file))
+//                    .build();
+//
+//            Request request = new Request.Builder()
+//                    .url("https://api.imgur.com/3/image")
+//                    .addHeader("Authorization", "Client-ID f1041ec178352c6")
+//                    .addHeader("content-type", "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW")
+//                    .post(requestBody)
+//                    .build();
+//
+//            OkHttpClient client = new OkHttpClient.Builder().build();
+//            okhttp3.Response response = client.newCall(request).execute();
+//            JSONObject jsonResponse = new JSONObject(response.body().string());
+//            return jsonResponse.getJSONObject("data").getString("link");
+            // IMGUR is blocked in Turkey. so, I used this image all the time
+            return "https://isbh.tmgrup.com.tr/sbh/2018/02/06/iste-telsiz-evde-horoz-sesi-dinliyor-1517908848435.jpg";
 
         }).requestOn(new AppExecutors().networkThread());
 
